@@ -1,0 +1,1 @@
+cmd_/home/hello_driver/lkm.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/hello_driver/lkm.ko /home/hello_driver/lkm.o /home/hello_driver/lkm.mod.o;  true
