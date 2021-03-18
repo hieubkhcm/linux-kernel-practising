@@ -13,8 +13,6 @@ MODULE_AUTHOR("Henry Le");
 MODULE_DESCRIPTION("A very simple LKM");
 MODULE_VERSION("0.1");
 
-
-
 static struct file_operations fops = {
 	.open = dm_device_open,
 	.release = dm_device_close,
