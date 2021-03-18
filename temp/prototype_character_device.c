@@ -9,9 +9,9 @@
 #include <linux/kdev_t.h>
 #include <linux/cdev.h>
 
-MODULE_LICENSE("GPL");            ///< The license type -- 4 dòng này không có cũng dc
-MODULE_AUTHOR("Ghi gì cũng được");    ///< The author -- visible when you use modinfo
-MODULE_DESCRIPTION("Ghi gì cũng được");  ///< The description -- see modinfo
+MODULE_LICENSE("GPL");            ///< The license type -- 4 dòng này không có cũng dc 
+MODULE_AUTHOR("Ghi gì cũng được");    ///< The author -- visible when you use modinfo dùng modinfo để coi
+MODULE_DESCRIPTION("Ghi gì cũng được");  ///< The description  dùng modinfo để coi
 MODULE_VERSION("Ghi gì cũng được");            ///< A version number to inform users
 
 static dev_t first; // Global variable for the first device number
@@ -50,7 +50,7 @@ static struct file_operations pugs_fops = //fops -> chỉ là tên - Ghi gì cũ
     .read = my_read,
     .write = my_write
 };// file_operations liệt kê mấy cái chức năng là cái FILE đó có, file thì thường có 4 chức năng cơ bản như quyển sách vậy
-// mở sách. đọc sách, viết vô sách, đọc xong đóng lại, không lẽ để mở chình ình ra đó.
+// mở sách. đọc sách, viết vô sách, đọc xong đóng lại
 
 
 static int __init ofcd_init(void) /* Constructor */
@@ -98,7 +98,4 @@ static void __exit ofcd_exit(void) /* Destructor */
 module_init(ofcd_init);
 module_exit(ofcd_exit);
 
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Anil Kumar Pugalia <email@sarika-pugs.com>");
-MODULE_DESCRIPTION("Our First Character Driver");
 
