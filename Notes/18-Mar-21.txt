@@ -1,0 +1,8 @@
+note về canf("%[^\n]%*c", str);
+
+scanf() sẽ trả về value nhét trong stdin. Nên cẩn thận để stdin không bị dơ, chứa value cũ của lần san trước, người ta có kiểu scanf(%[^\n]%*c,str)
+
+hiểu như sau:
+%[^\n] - quét lần đầu để gán vô str, [] lấy tất cả mọi thứ được liệt kê trong ngoặc, ko có gì thì ko quét gì hêt. ^\n = tất cả ký tự, trừ ký tự xuống cmn hàng \n. Hiểu là lấy toàn bộ string trừ \n, mà ko lấy \n thì hàm scanf() sẽ nhận \n như là xuống hàng chứ ko phải ký tự nữa. Lúc đó nó nạp chuỗi vô str.
+
+%*c là lần quét thứ 2, và cũng không gán cho ai, có mối str thì đã gán rồi còn đâu. %c, là lấy 1 ký tự char, =1 byte lun đó. xong * là bỏ cái ký tự đó đi, hiểu là quét xong bỏ. Nghĩa là cái ký tự cuối cùng nằm trong sdtin là \n, bị quét và vứt luôn, stdin sạch sẽ.

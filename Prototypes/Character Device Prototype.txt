@@ -1,0 +1,51 @@
+#include <linux/init.h>           // cần thiết cho hai hàm __init __exit <=> (insmod và rmmod)
+#include <linux/module.h>         // Core header for loading LKMs into the kernel
+#include <linux/device.h>         // Header to support the kernel Driver Model
+#include <linux/kernel.h>         // Contains types, macros, functions for the kernel
+#include <linux/fs.h>             // Header for the Linux file system support
+#include <linux/uaccess.h>          // user access <- cần cho mấy hàm copy to user (kernel space -> user space)
+
+
+#define  DEVICE_NAME "ebbchar"    // đăng ký xong tên này sẽ nằm trong /dev 
+#define  CLASS_NAME  "ebb"        // The device class -- this is a character device driver
+
+
+MODULE_LICENSE("GPL");            ///< The license type -- this affects available functionality
+MODULE_AUTHOR("Ghi gì cũng được");    ///< The author -- visible when you use modinfo
+MODULE_DESCRIPTION("Ghi gì cũng được");  ///< The description -- see modinfo
+MODULE_VERSION("Ghi gì cũng được");            ///< A version number to inform users
+
+//khai báo biến gì thì gom hết vô đây
+static int    majorNumber; 
+
+
+//khai báo hàm()
+static int     dev_open(struct inode *, struct file *); // dev_open -> Ghi gì cũng được -> match là được
+static int     dev_release(struct inode *, struct file *); // dev_release -> Ghi gì cũng được -> match là được
+static ssize_t dev_read(struct file *, char *, size_t, loff_t *); // dev_read -> Ghi gì cũng được -> match là được
+static ssize_t dev_write(struct file *, const char *, size_t, loff_t *); // dev_write -> Ghi gì cũng được -> match là được
+
+
+static struct file_operations fops = //fops -> chỉ là tên - Ghi gì cũng được, match với lúc gán là được 
+{
+   .open = dev_open,
+   .read = dev_read,
+   .write = dev_write,
+   .release = dev_release,
+}; // file_operations liệt kê mấy cái chức năng là cái FILE đó có, file thì thường có 4 chức năng cơ bản như quyển sách vậy
+// mở sách. đọc sách, viết vô sách, đọc xong đóng lại, không lẽ để mở chình ình ra đó.
+
+
+static int __init ebbchar_init(void){
+   printk(KERN_INFO "logging ra để debug\n");
+
+   // Try to dynamically allocate a major number for the device -- more difficult but worth it
+   majorNumber = register_chrdev(0, DEVICE_NAME, &fops);
+   if (majorNumber<0){
+      printk(KERN_ALERT "EBBChar failed to register a major number\n");
+      return majorNumber;
+   }
+   printk(KERN_INFO "EBBChar: registered correctly with major number %d\n", majorNumber);
+
+
+
