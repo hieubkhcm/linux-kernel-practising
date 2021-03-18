@@ -16,7 +16,7 @@ MODULE_VERSION("Ghi gì cũng được");            ///< A version number to in
 
 static dev_t first; // Global variable for the first device number
 static struct cdev c_dev; // Global variable for the character device structure
-static struct class *cl; // Global variable for the device class
+static struct class *cl; // Global variable for the device class - phục vụ cho tạo class_create() với device_create()
 static int    ret; //để debug là chủ yếu - viết theo phong cách Amarisoft
 
 //khai báo hàm() và code hàm luôn
@@ -53,7 +53,7 @@ static struct file_operations pugs_fops = //fops -> chỉ là tên - Ghi gì cũ
 // mở sách. đọc sách, viết vô sách, đọc xong đóng lại
 
 
-static int __init ofcd_init(void) /* Constructor */
+static int __init ofcd_init(void) /* Constructor */ //__init là để gắn module .ko vào, phía dưới có 1 đống code là để tạo ra file trong /dev cho user thao tác
 {
     int ret;
     struct device *dev_ret;
@@ -62,18 +62,18 @@ static int __init ofcd_init(void) /* Constructor */
     if ((ret = alloc_chrdev_region(&first, 0, 1, "Shweta")) < 0)
     {
         return ret;
-    }
-    if (IS_ERR(cl = class_create(THIS_MODULE, "chardrv")))
+    }// xong bước này là lấy được cặp số major minor nằm trong dev_t first
+    if (IS_ERR(cl = class_create(THIS_MODULE, "chardrv"))) // chardrv có thể đổi thoải mái, chạy thành công thì trong sys/class sẽ có file chardrv
     {
         unregister_chrdev_region(first, 1);
         return PTR_ERR(cl);
-    }
+    }// xong bước này thì struct class mới gán trị xong để parse tiêp vào hàm dưới device_create
     if (IS_ERR(dev_ret = device_create(cl, NULL, first, NULL, "mynull")))
     {
         class_destroy(cl);
         unregister_chrdev_region(first, 1);
         return PTR_ERR(dev_ret);
-    }
+    }//thành công thì vào /dev thấy driver mynull nhé
 
     cdev_init(&c_dev, &pugs_fops);
     if ((ret = cdev_add(&c_dev, first, 1)) < 0)
@@ -95,7 +95,7 @@ static void __exit ofcd_exit(void) /* Destructor */
     printk(KERN_INFO "Alvida: ofcd unregistered");
 }
 
-module_init(ofcd_init);
-module_exit(ofcd_exit);
+module_init(ofcd_init);//api để gắn .ko vô kernel
+module_exit(ofcd_exit);//api để gỡ .ko khỏi kernel
 
 
