@@ -17,7 +17,7 @@ MODULE_VERSION("Ghi gì cũng được");            ///< A version number to in
 static dev_t first; // Global variable for the first device number
 static struct cdev c_dev; // Global variable for the character device structure
 static struct class *cl; // Global variable for the device class - phục vụ cho tạo class_create() với device_create()
-static int    ret; //để debug là chủ yếu - viết theo phong cách Amarisoft
+//static int    ret; //để debug là chủ yếu - viết theo phong cách Amarisoft
 
 //khai báo hàm() và code hàm luôn
 static int my_open(struct inode *i, struct file *f) // my_open -> Ghi gì cũng được -> match là được
@@ -75,8 +75,12 @@ static int __init ofcd_init(void) /* Constructor */ //__init là để gắn mod
         return PTR_ERR(dev_ret);
     }//thành công thì vào /dev thấy driver mynull nhé
 
-    cdev_init(&c_dev, &pugs_fops);
-    if ((ret = cdev_add(&c_dev, first, 1)) < 0)
+    cdev_init(&c_dev, &pugs_fops); //cdev_init — initialize a cdev structure
+	// void cdev_init (	struct cdev * cdev,	const struct file_operations * fops);//xong bước này cdev mới hoàn thiện 
+	// để gán trong hàm dưới
+
+    if ((ret = cdev_add(&c_dev, first, 1)) < 0)//cdev_add — add a char device to the system
+//int cdev_add (struct cdev * p, dev_t dev, unsigned count); //count the number of consecutive minor numbers corresponding to this device
     {
         device_destroy(cl, first);
         class_destroy(cl);
