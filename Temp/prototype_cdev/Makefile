@@ -1,4 +1,4 @@
-obj-m += prototype_cdev.o
+obj-m += prototype_cdev_to_user.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
