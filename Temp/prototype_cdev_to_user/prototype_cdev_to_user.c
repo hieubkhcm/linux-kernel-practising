@@ -20,7 +20,9 @@ static struct cdev c_dev; // Global variable for the character device structure
 static struct class *cl; // Global variable for the device class - phục vụ cho tạo class_create() với device_create()
 //static int    ret; //để debug là chủ yếu - viết theo phong cách Amarisoft
 
-static char c;
+//static char c;
+static char   message[256];  
+static short  size_of_message; 
 
 //khai báo hàm() và code hàm luôn
 static int my_open(struct inode *i, struct file *f) // my_open -> Ghi gì cũng được -> match là được
@@ -33,12 +35,34 @@ static int my_close(struct inode *i, struct file *f) // my_close -> Ghi gì cũn
     printk(KERN_INFO "Henry_Driver: close() logging to debug\n\n");
     return 0;
 }
+
+//************
 static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
 {
+    int error_cnt;
     printk(KERN_INFO "Henry_Driver: read() logging to debug\n");
-    if (*off == 0)
+    error_cnt = copy_to_user(buf, message, size_of_message);
+    printk("Henry_logging: The message: %s  Size: %d\n", message, size_of_message);        
+    if (error_cnt != 0)
+            return -EFAULT;
+    else
     {
-        if (copy_to_user(buf, &c, 1) != 0)
+        size_of_message = 0;
+        return 0;
+    }
+}
+///////////
+/*//////////
+static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
+{
+    int error_cnt = 0;
+    printk(KERN_INFO "Henry_Driver: read() logging to debug\n");
+    printk("Henry_logging: The message: %s  Size: %d\n", message, size_of_message);        
+    error_cnt = copy_to_user(buf, message, size_of_message);
+    printk(KERN_INFO "Henry_Driver: error_count = %d\n", error_cnt);
+    if (*off != 0)
+    {
+        if (error_cnt != 0)
             return -EFAULT;
         else
         {
@@ -47,16 +71,40 @@ static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off
         }
     }
     else
+    {
+        *off = 0;
         return 0;
+    }
 }
+*//////////
+/*
+static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
+{
+    printk(KERN_INFO "Henry_Driver: read() logging to debug\n");
+    if (copy_to_user(buf, &message, 1)==0) // if true then have success
+    {            
+        printk(KERN_INFO "Henry_logging: Sent characters to the user\n");
+        return (size_of_message=0);  // clear the position to the start and return 0
+    }
+    else 
+    {
+        printk(KERN_INFO "Henry_logging: Failed to send characters to the user\n");
+        return -EFAULT;              // Failed -- return a bad address message (i.e. -14)
+    }
+}
+*/
 // my_write -> Ghi gì cũng được -> match là được
 static ssize_t my_write(struct file *f, const char __user *buf, size_t len, loff_t *off)
 {
     printk(KERN_INFO "Henry_Driver: write() logging to debug\n");
-    if (copy_from_user(&c, buf + len - 1, 1) != 0)
+    if (copy_from_user(message, buf, len) != 0)
         return -EFAULT;
     else
+    {
+        size_of_message = strlen(message);
+        printk("Henry_logging: The message: %s  Size: %d  len: %ld\n", message, size_of_message, len);
         return len;
+    }
 }
 
 static struct file_operations pugs_fops = //fops -> chỉ là tên - Ghi gì cũng được, match với lúc gán là được 
