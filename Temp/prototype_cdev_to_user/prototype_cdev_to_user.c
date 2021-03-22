@@ -24,7 +24,7 @@ static struct class *cl; // Global variable for the device class - phục vụ c
 static char   message[256];  
 static short  size_of_message; 
 
-//khai báo hàm() và code hàm luôn
+//khai báo hàm() và code hàm trực tiếp luôn
 static int my_open(struct inode *i, struct file *f) // my_open -> Ghi gì cũng được -> match là được
 {
     printk(KERN_INFO "Henry_Driver: open() logging to debug\n");
