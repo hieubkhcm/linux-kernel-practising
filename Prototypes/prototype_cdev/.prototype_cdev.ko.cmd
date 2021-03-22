@@ -1,0 +1,1 @@
+cmd_/home/PLab/Prototypes/prototype_cdev/prototype_cdev.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/PLab/Prototypes/prototype_cdev/prototype_cdev.ko /home/PLab/Prototypes/prototype_cdev/prototype_cdev.o /home/PLab/Prototypes/prototype_cdev/prototype_cdev.mod.o;  true

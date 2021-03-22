@@ -58,7 +58,7 @@ static int __init ofcd_init(void) /* Constructor */ //__init là để gắn mod
     int ret;
     struct device *dev_ret;
 
-    printk(KERN_INFO "Namaskar: ofcd registered");
+    printk(KERN_INFO "Namaskar: ofcd registered\n");
     if ((ret = alloc_chrdev_region(&first, 0, 1, "Shweta")) < 0)
     {
         return ret;
@@ -96,7 +96,7 @@ static void __exit ofcd_exit(void) /* Destructor */
     device_destroy(cl, first);
     class_destroy(cl);
     unregister_chrdev_region(first, 1);
-    printk(KERN_INFO "Alvida: ofcd unregistered");
+    printk(KERN_INFO "Alvida: ofcd unregistered\n");
 }
 
 module_init(ofcd_init);//api để gắn .ko vô kernel
