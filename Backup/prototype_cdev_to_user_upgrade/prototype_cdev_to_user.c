@@ -20,8 +20,8 @@ static struct cdev c_dev; // Global variable for the character device structure
 static struct class *cl; // Global variable for the device class - phục vụ cho tạo class_create() với device_create()
 //static int    ret; //để debug là chủ yếu - viết theo phong cách Amarisoft
 
-static char message[256] = "";
-static short size_of_message = 0;
+static char c;
+
 //khai báo hàm() và code hàm luôn
 static int my_open(struct inode *i, struct file *f) // my_open -> Ghi gì cũng được -> match là được
 {
@@ -36,34 +36,27 @@ static int my_close(struct inode *i, struct file *f) // my_close -> Ghi gì cũn
 static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
 {
     printk(KERN_INFO "Henry_Driver: read() logging to debug\n");
-    if (*off == size_of_message)
+    if (*off == 0)
     {
-        if (copy_to_user(buf, message, size_of_message) != 0)
+        if (copy_to_user(buf, &c, 1) != 0)
             return -EFAULT;
         else
         {
-         
             (*off)++;
             return 1;
         }
     }
     else
-    {
-        size_of_message = 0;
         return 0;
-    }
 }
 // my_write -> Ghi gì cũng được -> match là được
 static ssize_t my_write(struct file *f, const char __user *buf, size_t len, loff_t *off)
 {
     printk(KERN_INFO "Henry_Driver: write() logging to debug\n");
-    if (copy_from_user(message, buf, len) != 0)
+    if (copy_from_user(&c, buf + len - 1, 1) != 0)
         return -EFAULT;
     else
-        {
-        size_of_message = strlen(message);
         return len;
-        }
 }
 
 static struct file_operations pugs_fops = //fops -> chỉ là tên - Ghi gì cũng được, match với lúc gán là được 
