@@ -33,17 +33,27 @@ static int my_close(struct inode *i, struct file *f) // my_close -> Ghi gì cũn
     printk(KERN_INFO "Driver: close() logging ra để debug\n\n");
     return 0;
 }
-static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off) // my_read -> Ghi gì cũng được -> match là được
+static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
 {
-    printk(KERN_INFO "Driver: read()logging ra để debug\n\n");
-	buf[0] = c;
-    return 0;
+    printk(KERN_INFO "Driver: read()\n");
+    if (*off == 0)
+    {
+        if (copy_to_user(buf, &c, 1) != 0)
+            return -EFAULT;
+        else
+        {
+            (*off)++;
+            return 1;
+        }
+    }
+    else
+        return 0;
 }
 // my_write -> Ghi gì cũng được -> match là được
 static ssize_t my_write(struct file *f, const char __user *buf, size_t len, loff_t *off)
 {
-    printk(KERN_INFO "Driver: write()logging ra để debug\n\n");
-	if (copy_from_user(&c, buf + len – 1, 1) != 0)
+    printk(KERN_INFO "Driver: write()\n");
+    if (copy_from_user(&c, buf + len – 1, 1) != 0)
         return -EFAULT;
     else
         return len;
