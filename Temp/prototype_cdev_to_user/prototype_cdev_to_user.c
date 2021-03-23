@@ -105,8 +105,8 @@ static int __init ofcd_init(void) /* Constructor */ //__init là để gắn mod
     {//success thì first sec chứa dc dev_t, là cặp số major minor (chú ý type dev_t 32b)
         return ret;
     }// xong bước này là lấy được cặp số major minor nằm trong dev_t first
-    if (IS_ERR(cl = class_create(THIS_MODULE, "henry_class"))) // chardrv có thể đổi thoải mái, chạy thành công thì trong sys/class sẽ có file chardrv
-    {
+    if (IS_ERR(cl = class_create(THIS_MODULE, "henry_class"))) 
+    { // chạy thành công thì trong sys/class sẽ có file henry_class
         unregister_chrdev_region(first, 1);
         return PTR_ERR(cl);
     }// xong bước này thì struct class mới gán trị xong để parse tiêp vào hàm dưới device_create
