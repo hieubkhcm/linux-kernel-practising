@@ -6,6 +6,8 @@ all:
 	insmod prototype_cdev_to_user.ko
 	echo -n "henry" > /dev/henry_dev
 	cat /dev/henry_dev
+	./simple_api_test
+
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
 	rmmod prototype_cdev_to_user
