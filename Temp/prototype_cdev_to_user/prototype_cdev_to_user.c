@@ -10,33 +10,35 @@
 #include <linux/cdev.h>
 #include <linux/uaccess.h>
 
-MODULE_LICENSE("GPL");            ///< The license type -- 4 dòng này không có cũng dc 
+MODULE_LICENSE("GPL");            ///< The license type -- 4 dòng này như 1 thủ tục 
 MODULE_AUTHOR("Ghi gì cũng được");    ///< The author -- visible when you use modinfo dùng modinfo để coi
 MODULE_DESCRIPTION("Ghi gì cũng được");  ///< The description  dùng modinfo để coi
 MODULE_VERSION("Ghi gì cũng được");            ///< A version number to inform users
 
 static dev_t first; // biển first này có type dev_t để chứa cặp só major/minor
 static struct cdev c_dev; // Global variable for the character device structure
-static struct class *cl; // Global variable for the device class - phục vụ cho tạo class_create() với device_create()
+static struct class* cl; // Global variable for the device class - phục vụ cho tạo class_create() với device_create()
 //static int    ret; //để chứa giá trị trả về của return -->4debug, nếu cần
 
 //static char c;
 static char   message[256]="";  
-static short  size_of_message; 
+static short  size_of_message;
 
-//khai báo hàm() và code hàm trực tiếp luôn
+//match với .open trong khai báo fops
 static int my_open(struct inode *i, struct file *f) // my_open -> Ghi gì cũng được -> match là được
 {
     printk(KERN_INFO "Henry_Driver: open() logging to debug\n");
     return 0;
 }
+
+//match với .release trong khai báo fops
 static int my_close(struct inode *i, struct file *f) // my_close -> Ghi gì cũng được -> match là được
 {
     printk(KERN_INFO "Henry_Driver: close() logging to debug\n\n");
     return 0;
 }
 
-//************
+//match với .read trong khai báo fops
 static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
 {
     int error_cnt;
@@ -70,7 +72,7 @@ static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off
 }
 */
 
-// my_write -> Ghi gì cũng được -> match là được
+// my_write -> match với hàm .write trong fops
 static ssize_t my_write(struct file *f, const char __user *buf, size_t len, loff_t *off)
 {
     printk(KERN_INFO "Henry_Driver: write() logging to debug\n");
@@ -84,7 +86,7 @@ static ssize_t my_write(struct file *f, const char __user *buf, size_t len, loff
     }
 }
 
-static struct file_operations pugs_fops = //fops -> chỉ là tên - Ghi gì cũng được, match với lúc gán là được 
+static struct file_operations henrys_fops = //fops -> chỉ là tên - Ghi gì cũng được, match với lúc gán là được 
 {
     .owner = THIS_MODULE,
     .open = my_open,
@@ -95,7 +97,7 @@ static struct file_operations pugs_fops = //fops -> chỉ là tên - Ghi gì cũ
 // mở sách. đọc sách, viết vô sách, đọc xong đóng lại
 
 
-static int __init ofcd_init(void) /* Constructor */ //__init là để gắn module .ko vào, phía dưới có 1 đống code là để tạo ra file trong /dev cho user thao tác
+static int __init lkm_attach(void) /* Constructor */ //__init là để gắn module .ko vào, phía dưới có 1 đống code là để tạo ra file trong /dev cho user thao tác
 {
     int ret;
     struct device *dev_ret;
@@ -117,31 +119,33 @@ static int __init ofcd_init(void) /* Constructor */ //__init là để gắn mod
         return PTR_ERR(dev_ret);
     }//thành công thì vào /dev thấy driver mynull nhé
 
-    cdev_init(&c_dev, &pugs_fops); //cdev_init — initialize a cdev structure
-	// void cdev_init (	struct cdev * cdev,	const struct file_operations * fops);//xong bước này cdev mới hoàn thiện 
-	// để gán trong hàm dưới
+    cdev_init(&c_dev, &henrys_fops); // cdev_init — initialize a cdev structure
+	// void cdev_init (	struct cdev * cdev,	const struct file_operations * fops);
+    // xong bước này struct cdev sẵn sàng để gán trong hàm dưới
 
-    if ((ret = cdev_add(&c_dev, first, 1)) < 0)//cdev_add — add a char device to the system
-//int cdev_add (struct cdev * p, dev_t dev, unsigned count); //count the number of consecutive minor numbers corresponding to this device
+    if ((ret = cdev_add(&c_dev, first, 1)) < 0) 
+    // cdev_add — attach device này vô hệ thống cho kernel quản lý dùm
+    // int cdev_add (struct cdev * p, dev_t dev, unsigned count); 
+    // count the number of consecutive minor numbers corresponding to this device
     {
         device_destroy(cl, first);
         class_destroy(cl);
         unregister_chrdev_region(first, 1);
-        return ret;
+        return ret; // trả lỗi hàm cdev_add cho main --> 4debug
     }
     return 0;
 }
 
-static void __exit ofcd_exit(void) /* Destructor */
+static void __exit lkm_detach(void) /* Destructor */
 {
-    cdev_del(&c_dev);
-    device_destroy(cl, first);
-    class_destroy(cl);
-    unregister_chrdev_region(first, 1);
-    printk(KERN_INFO "Henry_log: device unregistered\n");
+    cdev_del(&c_dev); // step 1: gỡ device khỏi kernel
+    device_destroy(cl, first); // step 2: hủy device (trong /dev/)
+    class_destroy(cl); // step 3: hủy class trong /sys/class
+    unregister_chrdev_region(first, 1); // step 4: hủy cặp số major/minor
+    printk(KERN_INFO "Henry_log: device unregistered\n"); // optional: báo log
 }
 
-module_init(ofcd_init);//api to attach the .ko to kernel - henry's commnent
-module_exit(ofcd_exit);//api to detach the .ko from kernel - henry's comment
+module_init(lkm_attach);//api to attach the .ko to kernel - henry's commnent
+module_exit(lkm_detach);//api to detach the .ko from kernel - henry's comment
 
 
