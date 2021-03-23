@@ -15,13 +15,13 @@ MODULE_AUTHOR("Ghi gì cũng được");    ///< The author -- visible when you 
 MODULE_DESCRIPTION("Ghi gì cũng được");  ///< The description  dùng modinfo để coi
 MODULE_VERSION("Ghi gì cũng được");            ///< A version number to inform users
 
-static dev_t first; // Global variable for the first device number
+static dev_t first; // biển first này có type dev_t để chứa cặp só major/minor
 static struct cdev c_dev; // Global variable for the character device structure
 static struct class *cl; // Global variable for the device class - phục vụ cho tạo class_create() với device_create()
-//static int    ret; //để debug là chủ yếu - viết theo phong cách Amarisoft
+//static int    ret; //để chứa giá trị trả về của return -->4debug, nếu cần
 
 //static char c;
-static char   message[256];  
+static char   message[256]="";  
 static short  size_of_message; 
 
 //khai báo hàm() và code hàm trực tiếp luôn
@@ -41,6 +41,7 @@ static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off
 {
     int error_cnt;
     printk(KERN_INFO "Henry_Driver: read() logging to debug\n");
+
     error_cnt = copy_to_user(buf, message, size_of_message);
     printk("Henry_logging: The message: %s  Size: %d\n", message, size_of_message);        
     if (error_cnt != 0)
@@ -51,32 +52,7 @@ static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off
         return 0;
     }
 }
-///////////
-/*//////////
-static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
-{
-    int error_cnt = 0;
-    printk(KERN_INFO "Henry_Driver: read() logging to debug\n");
-    printk("Henry_logging: The message: %s  Size: %d\n", message, size_of_message);        
-    error_cnt = copy_to_user(buf, message, size_of_message);
-    printk(KERN_INFO "Henry_Driver: error_count = %d\n", error_cnt);
-    if (*off != 0)
-    {
-        if (error_cnt != 0)
-            return -EFAULT;
-        else
-        {
-            (*off)++;
-            return 1;
-        }
-    }
-    else
-    {
-        *off = 0;
-        return 0;
-    }
-}
-*//////////
+
 /*
 static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off)
 {
@@ -93,6 +69,7 @@ static ssize_t my_read(struct file *f, char __user *buf, size_t len, loff_t *off
     }
 }
 */
+
 // my_write -> Ghi gì cũng được -> match là được
 static ssize_t my_write(struct file *f, const char __user *buf, size_t len, loff_t *off)
 {
@@ -124,8 +101,8 @@ static int __init ofcd_init(void) /* Constructor */ //__init là để gắn mod
     struct device *dev_ret;
 
     printk(KERN_INFO "Henry_log: device registered\n");
-    if ((ret = alloc_chrdev_region(&first, 0, 1, "henry_ko")) < 0)
-    {
+    if ((ret = alloc_chrdev_region(&first, 0, 1, "henry_ko")) < 0) // ret negative là fail
+    {//success thì first sec chứa dc dev_t, là cặp số major minor (chú ý type dev_t 32b)
         return ret;
     }// xong bước này là lấy được cặp số major minor nằm trong dev_t first
     if (IS_ERR(cl = class_create(THIS_MODULE, "henry_class"))) // chardrv có thể đổi thoải mái, chạy thành công thì trong sys/class sẽ có file chardrv

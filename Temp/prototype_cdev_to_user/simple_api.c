@@ -42,7 +42,9 @@ int main(){
    getchar();//đợi một ký tự nhập vào // ?vầy có làm dơ stdin không?
 
    printf("Reading from the device...\n");
-   ret = read(fd, receive, BUFFER_LENGTH);        // Read the response from the LKM
+
+   //ssize_t read(int fd, void *buf, size_t count);
+   ret = read(fd, receive, BUFFER_LENGTH);//Success, ret no of bytes; Fail. ret -1
    if (ret < 0){
       perror("Failed to read the message from the device.");
       return errno;
