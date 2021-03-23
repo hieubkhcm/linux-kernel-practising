@@ -1,6 +1,7 @@
 // C program for finding the largest integer 
 // among three numbers using command line arguments 
 #include <stdio.h> 
+#include <stdlib.h>
   
 // Taking argument as command line 
 int main(int argc, char *argv[])  
@@ -12,7 +13,7 @@ int main(int argc, char *argv[])
     if (argc < 4 || argc > 5)  
     { 
         printf("enter 4 arguments only eg.\"filename arg1 arg2 arg3!!\""); 
-        return 0; 
+        return 0; // kết thúc hàm main, tra giá trị về là 0 
     } 
   
     // Converting string type to integer type 
