@@ -1,0 +1,16 @@
+Một số khái niệm cơ bản:
+
+Publisher: người phát bản tin đi, ví dụ một bản tin nhiệt độ từ sensor chẳng hạn, hành động phát tin đi được gọi là publish
+
+Subscriber: người sẽ nhận bản tin, đi như subscribe kênh youtube vậy, có video mới trên kênh thì nó sẽ báo để lên mà coi, thế thôi.
+
+Topic: ở đây topic chính là một kênh như trong youtube. Theo dõi kênh nào thì khi kênh đó có subscribe sẽ được thông báo, một client có thể đăng ký nhiều subscribe.
+
+Broker: tiếng Việt gọi là nhà cái, theo như quan sát thì nó giống như là con switch vậy, nhưng thay vì là các packet thì đây là các gói tin MQTT, các gói này sẽ được gửi tới cho các subscriber cùng một topic, quá là đơn giản.
+
+CloudMQTT, HiveMQ: là một broker, một server, có lẽ là free để nhận và gửi các bản tin mqtt.
+
+MQTT FX, MQTTlens: một open source software cài đặt trên windows 10 được, dùng để gửi nhận các gói tin mqtt.
+
+
+
