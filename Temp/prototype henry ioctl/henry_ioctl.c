@@ -8,7 +8,8 @@ int main(int argc, char *argv[])
 { 
     int a, b, c; 
   
-    // argc sẽ bằng số arg truyền vào, bao gồm cả exe, nên ở đây cần check có bằng 4 hay ko
+    // argc sẽ bằng số arg truyền vào, bao gồm cả exe, 
+    // ví dụ filename arg1 arg2 arg3 thì số argc sẽ là 4
     if (argc < 4 || argc > 5) //code này chỗ lớn hơn 5 có vẻ như sai
     { 
         printf("enter 4 arguments only eg.\"filename arg1 arg2 arg3!!\""); 
